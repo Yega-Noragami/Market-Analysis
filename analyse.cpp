@@ -79,7 +79,7 @@ int findIndex(vector<string> uniqueCompany, string code);
 vector<vector<techStock>> sortEntries(vector<techStock> allDatabase, vector<string> uniqueCompany);
 void getMarketcap(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 vector<vector<float>> get12MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
-vector<vector<float>> get24MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+vector<vector<float>> get26MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 vector<vector<float>> get50MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 vector<vector<float>> get200MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 void getMarketVolatilityByMonth(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
@@ -292,6 +292,7 @@ vector<vector<float>> get26MovingAvg(vector<vector<techStock>> allStocks, vector
         }
         movingAverageStack.push_back(average);
     }
+    return movingAverageStack;
 }
 // helper function to get 50 day moving average
 vector<vector<float>> get50MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
@@ -319,6 +320,7 @@ vector<vector<float>> get50MovingAvg(vector<vector<techStock>> allStocks, vector
         }
         movingAverageStack.push_back(average);
     }
+    return movingAverageStack;
 }
 // helper function to get 200 day moving average
 vector<vector<float>> get200MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
@@ -346,6 +348,7 @@ vector<vector<float>> get200MovingAvg(vector<vector<techStock>> allStocks, vecto
         }
         movingAverageStack.push_back(average);
     }
+    return movingAverageStack;
 }
 
 // -------------------------------- MOVING AVERAGE FUNCTIONS -------------------------------- //
@@ -380,11 +383,11 @@ void get12ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
     }
 }
 
-// helper function to get 24 day exponential moving average
-void get24ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+// helper function to get 12 day exponential moving averagevoid get24ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+void get26ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
-    vector<vector<float>> movingAverageStack = get24MovingAvg(allStocks, uniqueCompany);
-    int period = 24;
+    vector<vector<float>> movingAverageStack = get26MovingAvg(allStocks, uniqueCompany);
+    int period = 26;
     const int smoothingConst = 2;
     vector<vector<float>> exponentialMovingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
@@ -410,7 +413,6 @@ void get24ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
     }
 }
 
-// helper function to get 50 day exponential moving average
 void get50ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
     vector<vector<float>> movingAverageStack = get50MovingAvg(allStocks, uniqueCompany);
@@ -440,7 +442,6 @@ void get50ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
     }
 }
 
-// helper function to get 200 day exponential moving average
 void get200ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
     vector<vector<float>> movingAverageStack = get200MovingAvg(allStocks, uniqueCompany);
