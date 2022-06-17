@@ -77,6 +77,11 @@ private:
 void removeduplicate(vector<string> &vec);
 int findIndex(vector<string> uniqueCompany, string code);
 vector<vector<techStock>> sortEntries(vector<techStock> allDatabase, vector<string> uniqueCompany);
+void getMarketcap(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+void get12MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+void get24MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+void get50MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+void get100MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 
 int main()
 {
@@ -124,7 +129,46 @@ int main()
     }
 
     removeduplicate(uniqueCompany);
-    vector<vector<techStock>> sortedData = sortEntries(allDatabase, uniqueCompany);
+    vector<vector<techStock>> sortedData = sortEntries(allDatabases, uniqueCompany);
+    int choice;
+    do
+    {
+        cout << " What do you want to calculate \n 1-Find Market Cap \n 2-find 12 day moving Average \n 3-Mean time between tick changes \n 4-Median time betwwen tick changes \n 5-Longest time between trade \n 6-Longest time between tick change \n 7-Mean bid ask spread \n 8-Median bid ask spread \n 9-Examples of round number effect \n press 0 to exit \n";
+        cin >> choice;
+        switch (choice)
+        {
+        case 1:
+            getMarketcap(sortedData, uniqueCompany);
+            break;
+        case 2:
+            get12MovingAvg(sortedData, uniqueCompany);
+            break;
+            // case 3:
+            //     break;
+            // case 4:
+
+            //     break;
+            // case 5:
+
+            //     break;
+            // case 6:
+
+            //     break;
+            // case 7:
+
+            //     break;
+            // case 8:
+
+            //     break;
+            // case 9:
+
+            //     break;
+            // case 10:
+            //     generateReport(sortedData, uniqueCompany);
+        }
+    } while (choice != 0);
+
+    fil.close();
 
     return 0;
 }
@@ -134,11 +178,6 @@ void removeduplicate(vector<string> &vec)
 {
     sort(vec.begin(), vec.end());
     vec.erase(unique(vec.begin(), vec.end()), vec.end());
-
-    for (int i = 0; i < vec.size(); i++)
-    {
-        cout << vec[i] << endl;
-    }
 }
 // helper function to return index of companyName in vector
 int findIndex(vector<string> uniqueCompany, string code)
@@ -172,4 +211,141 @@ vector<vector<techStock>> sortEntries(vector<techStock> allDatabase, vector<stri
         sortedEntries[index].push_back(data);
     }
     return sortedEntries;
+}
+
+// helper function to find market cap of stocks
+void getMarketcap(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+{
+
+    vector<vector<float>> marketCapStack;
+    for (int i = 0; i < allStocks.size(); i++)
+    {
+        vector<float> marketCap;
+        for (int j = 0; j < allStocks[i].size(); j++)
+        {
+            marketCap.push_back(allStocks[i][j].getOpen() * allStocks[i][j].getVolume());
+        }
+        marketCapStack.push_back(marketCap);
+    }
+}
+
+// -------------------------------- MOVING AVERAGE FUNCTIONS -------------------------------- //
+
+// helper function to get 12 day moving average
+void get12MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+{
+
+    int period = 12;
+    vector<vector<float>> movingAverageStack;
+    for (int i = 0; i < allStocks.size(); i++)
+    {
+        vector<float> average;
+        int sum = 0;
+        for (int j = 0; j < allStocks[i].size(); j++)
+        {
+            if (j < period)
+            {
+                sum += allStocks[i][j].getClose();
+                average.push_back(0);
+            }
+            else
+            {
+                sum += allStocks[i][j].getClose();
+                sum -= allStocks[i][j - period].getClose();
+                average.push_back(sum / period);
+            }
+        }
+        movingAverageStack.push_back(average);
+    }
+
+    // for (int i = 0; i < movingAverageStack.size(); i++)
+    // {
+    //     cout << "uniqueCompany:" << uniqueCompany[i] << "12 day moving average" << endl;
+    //     for (int j = 0; j < allStocks[i].size(); j++)
+    //     {
+    //         cout << movingAverageStack[i][j] << ":";
+    //     }
+    //     cout << endl;
+    // }
+}
+// helper function to get 26 day moving average
+void get26MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+{
+
+    int period = 26;
+    vector<vector<float>> movingAverageStack;
+    for (int i = 0; i < allStocks.size(); i++)
+    {
+        vector<float> average;
+        int sum = 0;
+        for (int j = 0; j < allStocks[i].size(); j++)
+        {
+            if (j < period)
+            {
+                sum += allStocks[i][j].getClose();
+                average.push_back(0);
+            }
+            else
+            {
+                sum += allStocks[i][j].getClose();
+                sum -= allStocks[i][j - period].getClose();
+                average.push_back(sum / period);
+            }
+        }
+        movingAverageStack.push_back(average);
+    }
+}
+// helper function to get 50 day moving average
+void get50MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+{
+
+    int period = 50;
+    vector<vector<float>> movingAverageStack;
+    for (int i = 0; i < allStocks.size(); i++)
+    {
+        vector<float> average;
+        int sum = 0;
+        for (int j = 0; j < allStocks[i].size(); j++)
+        {
+            if (j < period)
+            {
+                sum += allStocks[i][j].getClose();
+                average.push_back(0);
+            }
+            else
+            {
+                sum += allStocks[i][j].getClose();
+                sum -= allStocks[i][j - period].getClose();
+                average.push_back(sum / period);
+            }
+        }
+        movingAverageStack.push_back(average);
+    }
+}
+// helper function to get 200 day moving average
+void get200MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+{
+
+    int period = 200;
+    vector<vector<float>> movingAverageStack;
+    for (int i = 0; i < allStocks.size(); i++)
+    {
+        vector<float> average;
+        int sum = 0;
+        for (int j = 0; j < allStocks[i].size(); j++)
+        {
+            if (j < period)
+            {
+                sum += allStocks[i][j].getClose();
+                average.push_back(0);
+            }
+            else
+            {
+                sum += allStocks[i][j].getClose();
+                sum -= allStocks[i][j - period].getClose();
+                average.push_back(sum / period);
+            }
+        }
+        movingAverageStack.push_back(average);
+    }
 }
