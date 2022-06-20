@@ -476,12 +476,11 @@ void get200ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<stri
 // helper function to calculate RSI for weekly data
 void getWeeklyRSI(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
-    const int period = 7;
+    const int period = 14;
 
     vector<vector<double>> WeeklyRSIAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
-        cout << "CompanyName" << allStocks[i][0].getCompanyName() << endl;
         vector<double> RSIweekly;
         double RSIndex, RSI;
         for (int j = 0; j < allStocks[i].size(); j++)
@@ -502,7 +501,7 @@ void getWeeklyRSI(vector<vector<techStock>> allStocks, vector<string> uniqueComp
                     }
                     else if (price < 0)
                     {
-                        loss.push_back(price);
+                        loss.push_back(-1 * price);
                     }
                 }
 
@@ -511,10 +510,8 @@ void getWeeklyRSI(vector<vector<techStock>> allStocks, vector<string> uniqueComp
                 RSIndex = averagegain / averageloss;
                 RSI = 100 - (100 / (1 + RSIndex));
                 RSIweekly.push_back(RSI);
-                // cout << RSI;
-                j += 6;
             }
-            else if (!RSIweekly.empty())
+            else if (!RSIweekly.empty() && j > period)
             {
                 double current = allStocks[i][j].getClose();
                 double previous = allStocks[i][j - 1].getClose();
@@ -540,15 +537,6 @@ void getWeeklyRSI(vector<vector<techStock>> allStocks, vector<string> uniqueComp
         }
         WeeklyRSIAverageStack.push_back(RSIweekly);
     }
-
-    // for (int i = 0; i < WeeklyRSIAverageStack.size(); i++)
-    // {
-    //     for (int j = 0; j < WeeklyRSIAverageStack[i].size(); j++)
-    //     {
-    //         cout << WeeklyRSIAverageStack[i][j] << ":";
-    //     }
-    //     cout << endl;
-    // }
 }
 
 //
