@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <numeric>
 using namespace std;
 
 // Date, High, Low, Open, Close, Volume, AdjClose, companyName
@@ -25,12 +26,12 @@ public:
     }
     // Constructor function to assign values.
     techStock(
-        float high,
-        float low,
-        float open,
-        float close,
-        float volume,
-        float adjClose,
+        double high,
+        double low,
+        double open,
+        double close,
+        double volume,
+        double adjClose,
         string date,
         string companyName)
     {
@@ -47,12 +48,12 @@ public:
 
     // helper function to access private variables
     string getDate() { return Date; }
-    float getHigh() { return High; }
-    float getLow() { return Low; }
-    float getOpen() { return Open; }
-    float getClose() { return Close; }
-    float getVolume() { return Volume; }
-    float getAdjClose() { return AdjClose; }
+    double getHigh() { return High; }
+    double getLow() { return Low; }
+    double getOpen() { return Open; }
+    double getClose() { return Close; }
+    double getVolume() { return Volume; }
+    double getAdjClose() { return AdjClose; }
     string getCompanyName() { return CompanyName; }
 
     // helper function to display records
@@ -63,12 +64,12 @@ public:
     }
 
 private:
-    float High;
-    float Low;
-    float Open;
-    float Close;
-    float Volume;
-    float AdjClose;
+    double High;
+    double Low;
+    double Open;
+    double Close;
+    double Volume;
+    double AdjClose;
     string Date;
     string CompanyName;
 };
@@ -78,16 +79,17 @@ void removeduplicate(vector<string> &vec);
 int findIndex(vector<string> uniqueCompany, string code);
 vector<vector<techStock>> sortEntries(vector<techStock> allDatabase, vector<string> uniqueCompany);
 void getMarketcap(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
-vector<vector<float>> get12MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
-vector<vector<float>> get26MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
-vector<vector<float>> get50MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
-vector<vector<float>> get200MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
-void getMarketVolatilityByMonth(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
-void getMarketVolatilityByYear(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+vector<vector<double>> get12MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+vector<vector<double>> get26MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+vector<vector<double>> get50MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+vector<vector<double>> get200MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+void getMarketVolatilityByMonth(vector<vector<techStock>> allStocks, vector<string> uniqueCompany); //-------------------- TO_DO ------------------//
+void getMarketVolatilityByYear(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);  // -------------------- TO_DO ---------------- //
 void get12ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 void get24ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 void get50ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 void get200ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+void getWeeklyRSI(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 
 int main()
 {
@@ -118,12 +120,12 @@ int main()
 
             result.push_back(substring);
         }
-        float High = float(stoi(result[0]));
-        float Low = float(stoi(result[1]));
-        float Open = float(stoi(result[2]));
-        float Close = float(stoi(result[3]));
-        float Volume = float(stoi(result[4]));
-        float AdjClose = float(stoi(result[5]));
+        double High = double(stold(result[0]));
+        double Low = double(stold(result[1]));
+        double Open = double(stold(result[2]));
+        double Close = double(stold(result[3]));
+        double Volume = double(stold(result[4]));
+        double AdjClose = double(stold(result[5]));
         string Date = result[6];
         string CompanyName = result[7];
 
@@ -139,7 +141,7 @@ int main()
     int choice;
     do
     {
-        cout << " What do you want to calculate \n 1-Find Market Cap \n 2-find 12 day moving Average \n 3-Get Market Volatility \n 4-Get 12 Day Exponential Moving Average \n 5-Longest time between trade \n 6-Longest time between tick change \n 7-Mean bid ask spread \n 8-Median bid ask spread \n 9-Examples of round number effect \n press 0 to exit \n";
+        cout << " What do you want to calculate \n 1-Find Market Cap \n 2-find 12 day moving Average \n 3-Get Market Volatility \n 4-Get 12 Day Exponential Moving Average \n 5-Get Weekly RSI index \n 6-Longest time between tick change \n 7-Mean bid ask spread \n 8-Median bid ask spread \n 9-Examples of round number effect \n press 0 to exit \n";
         cin >> choice;
         switch (choice)
         {
@@ -155,9 +157,9 @@ int main()
         case 4:
             get12ExponentialMovingAvg(sortedData, uniqueCompany);
             break;
-            // case 5:
-
-            //     break;
+        case 5:
+            getWeeklyRSI(sortedData, uniqueCompany);
+            break;
             // case 6:
 
             //     break;
@@ -223,11 +225,10 @@ vector<vector<techStock>> sortEntries(vector<techStock> allDatabase, vector<stri
 // helper function to find market cap of stocks
 void getMarketcap(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
-
-    vector<vector<float>> marketCapStack;
+    vector<vector<double>> marketCapStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
-        vector<float> marketCap;
+        vector<double> marketCap;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
             marketCap.push_back(allStocks[i][j].getOpen() * allStocks[i][j].getVolume());
@@ -239,13 +240,13 @@ void getMarketcap(vector<vector<techStock>> allStocks, vector<string> uniqueComp
 // -------------------------------- MOVING AVERAGE FUNCTIONS -------------------------------- //
 
 // helper function to get 12 day moving average
-vector<vector<float>> get12MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+vector<vector<double>> get12MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
     int period = 12;
-    vector<vector<float>> movingAverageStack;
+    vector<vector<double>> movingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
-        vector<float> average;
+        vector<double> average;
         int sum = 0;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
@@ -267,14 +268,14 @@ vector<vector<float>> get12MovingAvg(vector<vector<techStock>> allStocks, vector
     return movingAverageStack;
 }
 // helper function to get 26 day moving average
-vector<vector<float>> get26MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+vector<vector<double>> get26MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
 
     int period = 26;
-    vector<vector<float>> movingAverageStack;
+    vector<vector<double>> movingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
-        vector<float> average;
+        vector<double> average;
         int sum = 0;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
@@ -295,14 +296,14 @@ vector<vector<float>> get26MovingAvg(vector<vector<techStock>> allStocks, vector
     return movingAverageStack;
 }
 // helper function to get 50 day moving average
-vector<vector<float>> get50MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+vector<vector<double>> get50MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
 
     int period = 50;
-    vector<vector<float>> movingAverageStack;
+    vector<vector<double>> movingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
-        vector<float> average;
+        vector<double> average;
         int sum = 0;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
@@ -323,14 +324,14 @@ vector<vector<float>> get50MovingAvg(vector<vector<techStock>> allStocks, vector
     return movingAverageStack;
 }
 // helper function to get 200 day moving average
-vector<vector<float>> get200MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+vector<vector<double>> get200MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
 
     int period = 200;
-    vector<vector<float>> movingAverageStack;
+    vector<vector<double>> movingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
-        vector<float> average;
+        vector<double> average;
         int sum = 0;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
@@ -351,20 +352,20 @@ vector<vector<float>> get200MovingAvg(vector<vector<techStock>> allStocks, vecto
     return movingAverageStack;
 }
 
-// -------------------------------- MOVING AVERAGE FUNCTIONS -------------------------------- //
+// -------------------------------- EXPONENTIAL MOVING AVERAGE FUNCTIONS -------------------------------- //
 
 // helper function to get 12 day exponential moving average
 void get12ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
-    vector<vector<float>> movingAverageStack = get12MovingAvg(allStocks, uniqueCompany);
+    vector<vector<double>> movingAverageStack = get12MovingAvg(allStocks, uniqueCompany);
     int period = 12;
     const int smoothingConst = 2;
-    vector<vector<float>> exponentialMovingAverageStack;
+    vector<vector<double>> exponentialMovingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
         cout << "CompanyName:" << allStocks[i][0].getCompanyName() << endl;
-        vector<float> expontialavg;
-        float EMA = 0, prevEMA = movingAverageStack[i][period + 1];
+        vector<double> expontialavg;
+        double EMA = 0, prevEMA = movingAverageStack[i][period + 1];
         // cout << "ExponentialMovingAverage:" << prevEMA << endl;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
@@ -374,7 +375,7 @@ void get12ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
             }
             else
             {
-                float tempsmoothing = (2.0 / (1 + period));
+                double tempsmoothing = (2.0 / (1 + period));
                 EMA = (allStocks[i][j].getClose() - prevEMA) * tempsmoothing + prevEMA;
                 prevEMA = EMA;
             }
@@ -382,19 +383,18 @@ void get12ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
         exponentialMovingAverageStack.push_back(expontialavg);
     }
 }
-
 // helper function to get 26 day exponential moving averagevoid
 void get26ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
-    vector<vector<float>> movingAverageStack = get26MovingAvg(allStocks, uniqueCompany);
+    vector<vector<double>> movingAverageStack = get26MovingAvg(allStocks, uniqueCompany);
     int period = 26;
     const int smoothingConst = 2;
-    vector<vector<float>> exponentialMovingAverageStack;
+    vector<vector<double>> exponentialMovingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
         cout << "CompanyName:" << allStocks[i][0].getCompanyName() << endl;
-        vector<float> expontialavg;
-        float EMA = 0, prevEMA = movingAverageStack[i][period + 1];
+        vector<double> expontialavg;
+        double EMA = 0, prevEMA = movingAverageStack[i][period + 1];
         // cout << "ExponentialMovingAverage:" << prevEMA << endl;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
@@ -404,7 +404,7 @@ void get26ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
             }
             else
             {
-                float tempsmoothing = (2.0 / (1 + period));
+                double tempsmoothing = (2.0 / (1 + period));
                 EMA = (allStocks[i][j].getClose() - prevEMA) * tempsmoothing + prevEMA;
                 prevEMA = EMA;
             }
@@ -412,19 +412,18 @@ void get26ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
         exponentialMovingAverageStack.push_back(expontialavg);
     }
 }
-
 // helper function to get 50 day exponential moving averagevoid
 void get50ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
-    vector<vector<float>> movingAverageStack = get50MovingAvg(allStocks, uniqueCompany);
+    vector<vector<double>> movingAverageStack = get50MovingAvg(allStocks, uniqueCompany);
     int period = 50;
     const int smoothingConst = 2;
-    vector<vector<float>> exponentialMovingAverageStack;
+    vector<vector<double>> exponentialMovingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
         cout << "CompanyName:" << allStocks[i][0].getCompanyName() << endl;
-        vector<float> expontialavg;
-        float EMA = 0, prevEMA = movingAverageStack[i][period + 1];
+        vector<double> expontialavg;
+        double EMA = 0, prevEMA = movingAverageStack[i][period + 1];
         // cout << "ExponentialMovingAverage:" << prevEMA << endl;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
@@ -434,7 +433,7 @@ void get50ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
             }
             else
             {
-                float tempsmoothing = (2.0 / (1 + period));
+                double tempsmoothing = (2.0 / (1 + period));
                 EMA = (allStocks[i][j].getClose() - prevEMA) * tempsmoothing + prevEMA;
                 prevEMA = EMA;
             }
@@ -442,19 +441,18 @@ void get50ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
         exponentialMovingAverageStack.push_back(expontialavg);
     }
 }
-
 // helper function to get 200 day exponential moving averagevoid
 void get200ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
-    vector<vector<float>> movingAverageStack = get200MovingAvg(allStocks, uniqueCompany);
+    vector<vector<double>> movingAverageStack = get200MovingAvg(allStocks, uniqueCompany);
     int period = 200;
     const int smoothingConst = 2;
-    vector<vector<float>> exponentialMovingAverageStack;
+    vector<vector<double>> exponentialMovingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
         cout << "CompanyName:" << allStocks[i][0].getCompanyName() << endl;
-        vector<float> expontialavg;
-        float EMA = 0, prevEMA = movingAverageStack[i][period + 1];
+        vector<double> expontialavg;
+        double EMA = 0, prevEMA = movingAverageStack[i][period + 1];
         // cout << "ExponentialMovingAverage:" << prevEMA << endl;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
@@ -464,7 +462,7 @@ void get200ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<stri
             }
             else
             {
-                float tempsmoothing = (2.0 / (1 + period));
+                double tempsmoothing = (2.0 / (1 + period));
                 EMA = (allStocks[i][j].getClose() - prevEMA) * tempsmoothing + prevEMA;
                 prevEMA = EMA;
             }
@@ -472,53 +470,143 @@ void get200ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<stri
         exponentialMovingAverageStack.push_back(expontialavg);
     }
 }
-// -------------------------------------------  VOLATILITY  -----------------------------------------------------
 
-// to finish laer
-void getMarketVolatilityByMonth(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+// -------------------------------- RELATIVE STRENGTH INDEX  -------------------------------- //
+
+// helper function to calculate RSI for weekly data
+void getWeeklyRSI(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
+    const int period = 7;
 
-    vector<float> VolatilityCompanyStack;
+    vector<vector<double>> WeeklyRSIAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
-        vector<float> Volatility; // Variance
+        cout << "CompanyName" << allStocks[i][0].getCompanyName() << endl;
+        vector<double> RSIweekly;
+        double RSIndex, RSI;
+        for (int j = 0; j < allStocks[i].size(); j++)
+        {
+            double averagegain;
+            double averageloss;
+            if (RSIweekly.empty())
+            {
+                vector<double> gain;
+                vector<double> loss;
+                for (int k = j; k < j + period; k++)
+                {
+
+                    double price = allStocks[i][k + 1].getClose() - allStocks[i][k].getClose();
+                    if (price > 0)
+                    {
+                        gain.push_back(price);
+                    }
+                    else if (price < 0)
+                    {
+                        loss.push_back(price);
+                    }
+                }
+
+                averagegain = accumulate(gain.begin(), gain.end(), 0.0) / 7;
+                averageloss = accumulate(loss.begin(), loss.end(), 0.0) / 7;
+                RSIndex = averagegain / averageloss;
+                RSI = 100 - (100 / (1 + RSIndex));
+                RSIweekly.push_back(RSI);
+                // cout << RSI;
+                j += 6;
+            }
+            else if (!RSIweekly.empty())
+            {
+                double current = allStocks[i][j].getClose();
+                double previous = allStocks[i][j - 1].getClose();
+                double change = current - previous;
+
+                if (change > 0)
+                {
+                    double newPositive = (averagegain * (period - 1) + change) / period;
+                    double newNegative = (averageloss * (period - 1) + 0) / period;
+                    RSIndex = newPositive / newNegative;
+                    RSI = 100 - (100 / (1 + RSIndex));
+                    RSIweekly.push_back(RSI);
+                }
+                else if (change < 0)
+                {
+                    double newPositive = (averagegain * (period - 1) + 0) / period;
+                    double newNegative = (averageloss * (period - 1) + change) / period;
+                    RSIndex = newPositive / newNegative;
+                    RSI = 100 - (100 / (1 + RSIndex));
+                    RSIweekly.push_back(RSI);
+                }
+            }
+        }
+        WeeklyRSIAverageStack.push_back(RSIweekly);
+    }
+
+    // for (int i = 0; i < WeeklyRSIAverageStack.size(); i++)
+    // {
+    //     for (int j = 0; j < WeeklyRSIAverageStack[i].size(); j++)
+    //     {
+    //         cout << WeeklyRSIAverageStack[i][j] << ":";
+    //     }
+    //     cout << endl;
+    // }
+}
+
+//
+
+// -------------------------------------------  VOLATILITY  -----------------------------------------------------
+
+// to finish later
+void getMarketVolatilityByMonth(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+{
+    vector<double> VolatilityCompanyStack;
+    for (int i = 0; i < allStocks.size(); i++)
+    {
+        vector<double> Volatility; // Variance
         int iterator = 0;
 
         string startMonth = allStocks[i][0].getDate();
+        // cout << "Start Date:" << startMonth << endl;
         startMonth = startMonth.substr(5, 2);
+        // cout << "Start month:" << startMonth << endl;
         while (iterator < allStocks[i].size())
         {
             int tempCounter = 0;
             string month = allStocks[i][iterator].getDate();
             month = month.substr(5, 2);
+            // cout << ":" << month;
 
-            vector<string> data;
-            for (int j = 0; j < 35; j++)
+            vector<double> data;
+            for (int ptr = iterator; ptr < iterator + 31; ptr++)
             {
-                string tempMonth = allStocks[i][j].getDate();
+                string tempMonth = allStocks[i][ptr].getDate();
                 tempMonth = tempMonth.substr(5, 2);
-                if (month == tempMonth)
+                if (tempMonth == month)
                 {
-                    string tempDay = allStocks[i][j].getDate();
-                    tempDay = tempDay.substr(8, 2);
-                    cout << tempDay << endl;
-                    data.push_back(allStocks[i][j].getDate());
-                    tempCounter++;
+                    cout << allStocks[i][ptr].getClose() << ":";
+                    data.push_back(allStocks[i][ptr].getClose());
                 }
                 else if (tempMonth != month)
                 {
-                    cout << "MonthEnd" << endl;
                     break;
                 }
+                cout << endl;
             }
 
-            // float mean = calcMean(data);
-            // vector<float> deviation = calcDeviation(data , mean);
-            // vector<float> deviationSqu = calcDeviationSqu(deviation);
-            // float variance= calcVariance(deviation);
+            // for (int i = 0; i < data.size(); i++)
+            // {
+            //     cout << data[i] << ":";
+            // }
 
-            iterator += tempCounter;
+            // cout << "Inner temp month start" << endl;
+
+            // double mean = calcMean(data);
+            // vector<double> deviation = calcDeviation(data , mean);
+            // vector<double> deviationSqu = calcDeviationSqu(deviation);
+            // double variance= calcVariance(deviation);
+
+            iterator++;
         }
+        cout << endl;
     }
 }
 
