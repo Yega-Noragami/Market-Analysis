@@ -83,13 +83,13 @@ vector<vector<double>> get12MovingAvg(vector<vector<techStock>> allStocks, vecto
 vector<vector<double>> get26MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 vector<vector<double>> get50MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 vector<vector<double>> get200MovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
-void getMarketVolatilityByMonth(vector<vector<techStock>> allStocks, vector<string> uniqueCompany); //-------------------- TO_DO ------------------//
-void getMarketVolatilityByYear(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);  // -------------------- TO_DO ---------------- //
 void get12ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 void get24ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 void get50ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 void get200ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
-void getWeeklyRSI(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
+void getMarketVolatilityByMonth(vector<vector<techStock>> allStocks, vector<string> uniqueCompany); //-------------------- TO_DO ------------------//
+void getMarketVolatilityByYear(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);  // -------------------- TO_DO ---------------- //
+void getBiWeeklyRSI(vector<vector<techStock>> allStocks, vector<string> uniqueCompany);
 
 int main()
 {
@@ -158,7 +158,7 @@ int main()
             get12ExponentialMovingAvg(sortedData, uniqueCompany);
             break;
         case 5:
-            getWeeklyRSI(sortedData, uniqueCompany);
+            getBiWeeklyRSI(sortedData, uniqueCompany);
             break;
             // case 6:
 
@@ -247,24 +247,24 @@ vector<vector<double>> get12MovingAvg(vector<vector<techStock>> allStocks, vecto
     for (int i = 0; i < allStocks.size(); i++)
     {
         vector<double> average;
-        int sum = 0;
+        vector<double> sum;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
             if (j < period)
             {
-                sum += allStocks[i][j].getClose();
+                sum.push_back(allStocks[i][j].getClose());
                 average.push_back(0);
             }
             else
             {
-                sum += allStocks[i][j].getClose();
-                sum -= allStocks[i][j - period].getClose();
-                average.push_back(sum / period);
+                sum.push_back(allStocks[i][j].getClose());
+                double newMean = accumulate(sum.begin(), sum.end(), 0.0) / period;
+                average.push_back(newMean);
+                sum.erase(sum.begin());
             }
         }
         movingAverageStack.push_back(average);
     }
-
     return movingAverageStack;
 }
 // helper function to get 26 day moving average
@@ -276,19 +276,20 @@ vector<vector<double>> get26MovingAvg(vector<vector<techStock>> allStocks, vecto
     for (int i = 0; i < allStocks.size(); i++)
     {
         vector<double> average;
-        int sum = 0;
+        vector<double> sum;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
             if (j < period)
             {
-                sum += allStocks[i][j].getClose();
+                sum.push_back(allStocks[i][j].getClose());
                 average.push_back(0);
             }
             else
             {
-                sum += allStocks[i][j].getClose();
-                sum -= allStocks[i][j - period].getClose();
-                average.push_back(sum / period);
+                sum.push_back(allStocks[i][j].getClose());
+                double newMean = accumulate(sum.begin(), sum.end(), 0.0) / period;
+                average.push_back(newMean);
+                sum.erase(sum.begin());
             }
         }
         movingAverageStack.push_back(average);
@@ -304,19 +305,20 @@ vector<vector<double>> get50MovingAvg(vector<vector<techStock>> allStocks, vecto
     for (int i = 0; i < allStocks.size(); i++)
     {
         vector<double> average;
-        int sum = 0;
+        vector<double> sum;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
             if (j < period)
             {
-                sum += allStocks[i][j].getClose();
+                sum.push_back(allStocks[i][j].getClose());
                 average.push_back(0);
             }
             else
             {
-                sum += allStocks[i][j].getClose();
-                sum -= allStocks[i][j - period].getClose();
-                average.push_back(sum / period);
+                sum.push_back(allStocks[i][j].getClose());
+                double newMean = accumulate(sum.begin(), sum.end(), 0.0) / period;
+                average.push_back(newMean);
+                sum.erase(sum.begin());
             }
         }
         movingAverageStack.push_back(average);
@@ -332,19 +334,20 @@ vector<vector<double>> get200MovingAvg(vector<vector<techStock>> allStocks, vect
     for (int i = 0; i < allStocks.size(); i++)
     {
         vector<double> average;
-        int sum = 0;
+        vector<double> sum;
         for (int j = 0; j < allStocks[i].size(); j++)
         {
             if (j < period)
             {
-                sum += allStocks[i][j].getClose();
+                sum.push_back(allStocks[i][j].getClose());
                 average.push_back(0);
             }
             else
             {
-                sum += allStocks[i][j].getClose();
-                sum -= allStocks[i][j - period].getClose();
-                average.push_back(sum / period);
+                sum.push_back(allStocks[i][j].getClose());
+                double newMean = accumulate(sum.begin(), sum.end(), 0.0) / period;
+                average.push_back(newMean);
+                sum.erase(sum.begin());
             }
         }
         movingAverageStack.push_back(average);
@@ -363,7 +366,6 @@ void get12ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
     vector<vector<double>> exponentialMovingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
-        cout << "CompanyName:" << allStocks[i][0].getCompanyName() << endl;
         vector<double> expontialavg;
         double EMA = 0, prevEMA = movingAverageStack[i][period + 1];
         // cout << "ExponentialMovingAverage:" << prevEMA << endl;
@@ -392,7 +394,6 @@ void get26ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
     vector<vector<double>> exponentialMovingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
-        cout << "CompanyName:" << allStocks[i][0].getCompanyName() << endl;
         vector<double> expontialavg;
         double EMA = 0, prevEMA = movingAverageStack[i][period + 1];
         // cout << "ExponentialMovingAverage:" << prevEMA << endl;
@@ -421,7 +422,6 @@ void get50ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<strin
     vector<vector<double>> exponentialMovingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
-        cout << "CompanyName:" << allStocks[i][0].getCompanyName() << endl;
         vector<double> expontialavg;
         double EMA = 0, prevEMA = movingAverageStack[i][period + 1];
         // cout << "ExponentialMovingAverage:" << prevEMA << endl;
@@ -450,7 +450,6 @@ void get200ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<stri
     vector<vector<double>> exponentialMovingAverageStack;
     for (int i = 0; i < allStocks.size(); i++)
     {
-        cout << "CompanyName:" << allStocks[i][0].getCompanyName() << endl;
         vector<double> expontialavg;
         double EMA = 0, prevEMA = movingAverageStack[i][period + 1];
         // cout << "ExponentialMovingAverage:" << prevEMA << endl;
@@ -473,9 +472,25 @@ void get200ExponentialMovingAvg(vector<vector<techStock>> allStocks, vector<stri
 
 // -------------------------------- RELATIVE STRENGTH INDEX  -------------------------------- //
 
-// helper function to calculate RSI for weekly data
-void getWeeklyRSI(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
+// helper function to calculate RSI for bi-weekly data
+void getBiWeeklyRSI(vector<vector<techStock>> allStocks, vector<string> uniqueCompany)
 {
+    /*
+    DEFINITION:
+
+    During an uptrend, the RSI tends to stay above 30 and should frequently hit 70.
+    During a downtrend, it is rare to see the RSI exceed 70, and the indicator
+    frequently hits 30 or below.
+
+    If the RSI can’t reach 70 on a number of consecutive price swings during an
+    uptrend, but then drops below 30, the trend has weakened and could be
+    reversing lower.
+
+    The opposite is true for a downtrend. If the downtrend is unable to reach 30
+    or below and then rallies above 70, that downtrend has weakened and could be
+    reversing to the upside.
+    */
+
     const int period = 14;
 
     vector<vector<double>> WeeklyRSIAverageStack;
@@ -538,8 +553,6 @@ void getWeeklyRSI(vector<vector<techStock>> allStocks, vector<string> uniqueComp
         WeeklyRSIAverageStack.push_back(RSIweekly);
     }
 }
-
-//
 
 // -------------------------------------------  VOLATILITY  -----------------------------------------------------
 
