@@ -2,7 +2,7 @@
 Stock Market Analysis usnig C++
 
 ## AIM 
-The Aim of this project was to conduct market analysis of top 10 Tech stock by market capitalization. I extracted financial data using yahoo finance API and saved the data in a csv file. I used C++ for parsing the data and perfomed analaysis. 
+The Aim of this project was to conduct market analysis of top 10 Tech stock by market capitalization. I extracted financial data using yahoo finance API and saved the data in a csv file. I used C++ for parsing the data and performed analysis. 
 
 ### Market Capitalization
 Market capitalization refers to the total dollar market value of a company's outstanding shares of stock. Commonly referred to as "market cap," it's calculated by multiplying the total number of a company's outstanding shares by the current market price of one share.
